@@ -4,7 +4,7 @@ function App() {
   return (
     <div id="canvas-container">
       <Canvas>
-        <></>
+        <mesh />
       </Canvas>
     </div>
   )
