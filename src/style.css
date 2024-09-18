@@ -1,0 +1,10 @@
+html,
+body,
+#root,
+#canvas-container {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
