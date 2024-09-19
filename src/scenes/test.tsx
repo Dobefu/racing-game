@@ -1,27 +1,27 @@
-import Box from "../objects/Box"
-import { OrbitControls, Plane, Sky } from "@react-three/drei"
+import { Box, OrbitControls, Plane, Sky } from "@react-three/drei"
 import { RigidBody } from "@react-three/rapier"
-import { Euler, MeshBasicMaterial } from "three"
+import { Euler, MeshPhongMaterial } from "three"
 
 export default function TestScene() {
   return (
     <>
       <Sky sunPosition={[100, 20, 100]} />
       <ambientLight intensity={0.1} />
-      <directionalLight position={[0, 0, 5]} />
+      <directionalLight intensity={1.5} position={[3, 5, 10]} castShadow />
       <OrbitControls />
 
-      <Box />
+      <RigidBody>
+        <Box castShadow material={new MeshPhongMaterial()} />
+      </RigidBody>
 
       <RigidBody>
-        <mesh
+        <Plane
           position={[0, -2, 0]}
           scale={[10, 10, 1]}
           rotation={new Euler((-Math.PI / 180) * 90, 0, 0)}
-        >
-          <Plane material={new MeshBasicMaterial()} />
-          <meshPhongMaterial />
-        </mesh>
+          receiveShadow
+          material={new MeshPhongMaterial({ shininess: 10 })}
+        />
       </RigidBody>
     </>
   )

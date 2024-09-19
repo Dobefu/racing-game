@@ -10,7 +10,7 @@ function App() {
 
   return (
     <div id="canvas-container">
-      <Canvas>
+      <Canvas shadows>
         {config.debug && <Perf position="top-left" />}
 
         <Suspense>
