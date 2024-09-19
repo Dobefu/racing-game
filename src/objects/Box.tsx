@@ -1,18 +1,13 @@
-import { MeshProps, useFrame } from "@react-three/fiber"
-import { useRef } from "react"
-import { type Mesh } from "three"
+import { MeshProps } from "@react-three/fiber"
+import { RigidBody } from "@react-three/rapier"
 
 export default function Box(props: MeshProps) {
-  const meshRef = useRef<Mesh>(null!)
-
-  useFrame((_state, delta) => {
-    meshRef.current.rotation.y += 1 * delta
-  })
-
   return (
-    <mesh {...props} ref={meshRef}>
-      <boxGeometry />
-      <meshPhongMaterial />
-    </mesh>
+    <RigidBody>
+      <mesh {...props}>
+        <boxGeometry />
+        <meshPhongMaterial />
+      </mesh>
+    </RigidBody>
   )
 }

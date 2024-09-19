@@ -1,6 +1,7 @@
 import Box from "../objects/Box"
-import { Sky } from "@react-three/drei"
-import { Euler } from "three"
+import { OrbitControls, Plane, Sky } from "@react-three/drei"
+import { RigidBody } from "@react-three/rapier"
+import { Euler, MeshBasicMaterial } from "three"
 
 export default function TestScene() {
   return (
@@ -8,8 +9,20 @@ export default function TestScene() {
       <Sky sunPosition={[100, 20, 100]} />
       <ambientLight intensity={0.1} />
       <directionalLight position={[0, 0, 5]} />
+      <OrbitControls />
 
-      <Box rotation={new Euler(0.3, 0, 0)} />
+      <Box />
+
+      <RigidBody>
+        <mesh
+          position={[0, -2, 0]}
+          scale={[10, 10, 1]}
+          rotation={new Euler((-Math.PI / 180) * 90, 0, 0)}
+        >
+          <Plane material={new MeshBasicMaterial()} />
+          <meshPhongMaterial />
+        </mesh>
+      </RigidBody>
     </>
   )
 }
