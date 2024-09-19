@@ -1,0 +1,3 @@
+globalThis.config = {
+  debug: true,
+}
