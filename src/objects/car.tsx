@@ -11,18 +11,25 @@ import {
   RapierRigidBody,
   RigidBody,
   useRevoluteJoint,
-  useSpringJoint,
 } from "@react-three/rapier"
 import { createRef, forwardRef, Ref, RefObject, useRef } from "react"
-import { BufferGeometry, Mesh, MeshPhongMaterial, Vector3Tuple } from "three"
+import {
+  BufferGeometry,
+  Mesh,
+  MeshPhongMaterial,
+  Vector3,
+  Vector3Tuple,
+} from "three"
 
 const WheelJoint = ({
+  index,
   body,
   wheel,
   bodyAnchor,
   wheelAnchor,
   rotationAxis,
 }: {
+  index: number
   body: RefObject<RapierRigidBody>
   wheel: RefObject<RapierRigidBody>
   bodyAnchor: Vector3Tuple
@@ -37,16 +44,30 @@ const WheelJoint = ({
     rotationAxis,
   ])
 
-  useSpringJoint(body, wheel, [bodyAnchor, wheelAnchor, 0, 0, 0])
-
   useFrame(() => {
+    const input = get()
+
     if (joint.current) {
-      if (get().forward) {
-        joint.current.configureMotorVelocity(-20, 10)
+      if (input.forward) {
+        wheel.current?.applyTorqueImpulse(new Vector3(-0.1, 0, 0), true)
       }
 
-      if (get().backward) {
-        joint.current.configureMotorVelocity(20, 10)
+      if (input.left && index % 2 === 0) {
+        wheel.current?.applyTorqueImpulse(
+          new Vector3(input.backward ? 0.2 : -0.2, 0, 0),
+          true,
+        )
+      }
+
+      if (input.right && index % 2 !== 0) {
+        wheel.current?.applyTorqueImpulse(
+          new Vector3(input.backward ? 0.2 : -0.2, 0, 0),
+          true,
+        )
+      }
+
+      if (input.backward) {
+        wheel.current?.applyTorqueImpulse(new Vector3(0.1, 0, 0), true)
       }
     }
   })
@@ -84,10 +105,10 @@ export default forwardRef(function Car(props: GroupProps, ref: Ref<Mesh>) {
   const chassisBody = useRef<RapierRigidBody>(null)
 
   const wheelPositions: [number, number, number][] = [
-    [0.6, -0.25, -0.75],
-    [0.6, -0.25, 0.75],
-    [-0.6, -0.25, -0.75],
-    [-0.6, -0.25, 0.75],
+    [0.75, -0.25, -1.1],
+    [-0.75, -0.25, -1.1],
+    [0.75, -0.25, 1.1],
+    [-0.75, -0.25, 1.1],
   ]
 
   const wheelRefs = useRef(
@@ -131,7 +152,7 @@ export default forwardRef(function Car(props: GroupProps, ref: Ref<Mesh>) {
           type="dynamic"
           key={index}
           ref={wheelRefs.current[index]}
-          scale={[0.1, 0.2, 0.2]}
+          scale={[0.5, 1, 1]}
           angularDamping={0.1}
         >
           <Cylinder
@@ -146,6 +167,7 @@ export default forwardRef(function Car(props: GroupProps, ref: Ref<Mesh>) {
       {wheelPositions.map((wheelPosition, index) => (
         <WheelJoint
           key={index}
+          index={index}
           body={chassisBody}
           wheel={wheelRefs.current[index]}
           bodyAnchor={wheelPosition}

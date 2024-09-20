@@ -7,7 +7,7 @@ globalThis.config = {
   controls: {
     forward: ["w", "i"],
     backward: ["s", "k"],
-    left: ["a", "h"],
+    left: ["a", "j"],
     right: ["d", "l"],
   },
 }

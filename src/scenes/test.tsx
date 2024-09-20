@@ -17,8 +17,8 @@ export default function TestScene() {
 
     camera.position.set(
       carRef.current.parent.position.x,
-      carRef.current.parent.position.y + 2,
-      carRef.current.parent.position.z + 4,
+      carRef.current.parent.position.y + 4,
+      carRef.current.parent.position.z + 8,
     )
   })
 
@@ -28,7 +28,7 @@ export default function TestScene() {
       <ambientLight intensity={0.25} />
       <directionalLight intensity={1.5} position={[3, 5, 10]} castShadow />
 
-      <Car ref={carRef} position={[0, 0.5, 0]} />
+      <Car ref={carRef} position={[0, 1.5, 0]} />
 
       <RigidBody type="fixed">
         <Plane
