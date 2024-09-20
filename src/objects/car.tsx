@@ -1,5 +1,11 @@
 import useConfig from "../hooks/useConfig"
-import { Box, Cylinder, ShapeProps } from "@react-three/drei"
+import { Controls } from "../types/controls"
+import {
+  Box,
+  Cylinder,
+  ShapeProps,
+  useKeyboardControls,
+} from "@react-three/drei"
 import { GroupProps, useFrame } from "@react-three/fiber"
 import {
   RapierRigidBody,
@@ -7,8 +13,8 @@ import {
   useRevoluteJoint,
   useSpringJoint,
 } from "@react-three/rapier"
-import { createRef, RefObject, useRef } from "react"
-import { BufferGeometry, MeshPhongMaterial, Vector3Tuple } from "three"
+import { createRef, forwardRef, Ref, RefObject, useRef } from "react"
+import { BufferGeometry, Mesh, MeshPhongMaterial, Vector3Tuple } from "three"
 
 const WheelJoint = ({
   body,
@@ -23,6 +29,8 @@ const WheelJoint = ({
   wheelAnchor: Vector3Tuple
   rotationAxis: Vector3Tuple
 }) => {
+  const [_, get] = useKeyboardControls<Controls>()
+
   const joint = useRevoluteJoint(body, wheel, [
     bodyAnchor,
     wheelAnchor,
@@ -33,14 +41,20 @@ const WheelJoint = ({
 
   useFrame(() => {
     if (joint.current) {
-      joint.current.configureMotorVelocity(-20, 10)
+      if (get().forward) {
+        joint.current.configureMotorVelocity(-20, 10)
+      }
+
+      if (get().backward) {
+        joint.current.configureMotorVelocity(20, 10)
+      }
     }
   })
 
   return null
 }
 
-export default function Car(props: GroupProps) {
+export default forwardRef(function Car(props: GroupProps, ref: Ref<Mesh>) {
   const { config } = useConfig()
 
   const modelProps: ShapeProps<typeof BufferGeometry> = {
@@ -83,7 +97,12 @@ export default function Car(props: GroupProps) {
   return (
     <group {...props}>
       <RigidBody ref={chassisBody} colliders="cuboid" type="dynamic">
-        <Box {...modelProps} material={chassisMaterial} scale={[1, 0.5, 2]} />
+        <Box
+          ref={ref}
+          {...modelProps}
+          material={chassisMaterial}
+          scale={[1, 0.5, 2]}
+        />
         <Box
           {...modelProps}
           material={chassisMaterial}
@@ -113,6 +132,7 @@ export default function Car(props: GroupProps) {
           key={index}
           ref={wheelRefs.current[index]}
           scale={[0.1, 0.2, 0.2]}
+          angularDamping={0.1}
         >
           <Cylinder
             rotation={[0, 0, Math.PI / 2]}
@@ -135,4 +155,4 @@ export default function Car(props: GroupProps) {
       ))}
     </group>
   )
-}
+})

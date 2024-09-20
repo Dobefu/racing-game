@@ -5,9 +5,9 @@ globalThis.config = {
     wireframe: false,
   },
   controls: {
-    forward: "w",
-    backward: "s",
-    left: "a",
-    right: "d",
+    forward: ["w", "i"],
+    backward: ["s", "k"],
+    left: ["a", "h"],
+    right: ["d", "l"],
   },
 }

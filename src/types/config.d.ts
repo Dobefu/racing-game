@@ -1,6 +1,6 @@
 export {}
 
-interface Config {
+export interface Config {
   debug?: DebugOptions
   controls?: ControlsOptions
 }
@@ -12,10 +12,10 @@ interface DebugOptions {
 }
 
 interface ControlsOptions {
-  forward?: string
-  backward?: string
-  left?: string
-  right?: string
+  forward?: string[]
+  backward?: string[]
+  left?: string[]
+  right?: string[]
 }
 
 declare global {
