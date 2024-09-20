@@ -11,10 +11,10 @@ function App() {
   return (
     <div id="canvas-container">
       <Canvas shadows>
-        {config.debug && <Perf position="top-left" />}
+        {config.debug?.stats && <Perf position="top-left" />}
 
         <Suspense>
-          <Physics debug={config.debug} gravity={[0, -9.8, 0]}>
+          <Physics debug={config.debug?.physics} gravity={[0, -9.8, 0]}>
             <TestScene />
           </Physics>
         </Suspense>

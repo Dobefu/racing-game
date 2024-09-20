@@ -1,3 +1,7 @@
 globalThis.config = {
-  debug: false,
+  debug: {
+    stats: true,
+    physics: true,
+    wireframe: false,
+  },
 }

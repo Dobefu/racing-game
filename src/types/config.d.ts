@@ -1,7 +1,13 @@
 export {}
 
 interface Config {
-  debug: boolean
+  debug?: DebugOptions
+}
+
+interface DebugOptions {
+  stats?: boolean
+  physics?: boolean
+  wireframe?: boolean
 }
 
 declare global {
