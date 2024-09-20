@@ -1,14 +1,51 @@
 import useConfig from "../hooks/useConfig"
 import { Box, Cylinder, ShapeProps } from "@react-three/drei"
-import { MeshProps } from "@react-three/fiber"
-import { RigidBody } from "@react-three/rapier"
-import { BufferGeometry, Euler, MeshPhongMaterial } from "three"
+import { GroupProps, useFrame } from "@react-three/fiber"
+import {
+  RapierRigidBody,
+  RigidBody,
+  useRevoluteJoint,
+  useSpringJoint,
+} from "@react-three/rapier"
+import { createRef, RefObject, useRef } from "react"
+import { BufferGeometry, MeshPhongMaterial, Vector3Tuple } from "three"
 
-export default function Car(props: MeshProps) {
+const WheelJoint = ({
+  body,
+  wheel,
+  bodyAnchor,
+  wheelAnchor,
+  rotationAxis,
+}: {
+  body: RefObject<RapierRigidBody>
+  wheel: RefObject<RapierRigidBody>
+  bodyAnchor: Vector3Tuple
+  wheelAnchor: Vector3Tuple
+  rotationAxis: Vector3Tuple
+}) => {
+  const joint = useRevoluteJoint(body, wheel, [
+    bodyAnchor,
+    wheelAnchor,
+    rotationAxis,
+  ])
+
+  useSpringJoint(body, wheel, [bodyAnchor, wheelAnchor, 0, 0, 0])
+
+  useFrame(() => {
+    if (joint.current) {
+      joint.current.configureMotorVelocity(-20, 10)
+    }
+  })
+
+  return null
+}
+
+export default function Car(props: GroupProps) {
   const { config } = useConfig()
 
   const modelProps: ShapeProps<typeof BufferGeometry> = {
     castShadow: true,
+    receiveShadow: true,
   }
 
   const chassisMaterial = new MeshPhongMaterial({
@@ -30,9 +67,22 @@ export default function Car(props: MeshProps) {
     wireframe: config.debug?.wireframe,
   })
 
+  const chassisBody = useRef<RapierRigidBody>(null)
+
+  const wheelPositions: [number, number, number][] = [
+    [0.6, -0.25, -0.75],
+    [0.6, -0.25, 0.75],
+    [-0.6, -0.25, -0.75],
+    [-0.6, -0.25, 0.75],
+  ]
+
+  const wheelRefs = useRef(
+    wheelPositions.map(() => createRef<RapierRigidBody>()),
+  )
+
   return (
-    <mesh {...props}>
-      <RigidBody>
+    <group {...props}>
+      <RigidBody ref={chassisBody} colliders="cuboid" type="dynamic">
         <Box {...modelProps} material={chassisMaterial} scale={[1, 0.5, 2]} />
         <Box
           {...modelProps}
@@ -53,41 +103,36 @@ export default function Car(props: MeshProps) {
           scale={[0.75, 0.25, 0.75]}
           position={[0, 0.375, -0.25]}
         />
-        {/* </RigidBody>
-
-      <RigidBody> */}
-        <Cylinder
-          {...modelProps}
-          material={wheelMaterial}
-          rotation={new Euler(0, 0, (-Math.PI / 180) * 90)}
-          scale={[0.2, 0.1, 0.2]}
-          position={[-0.5, -0.25, -0.75]}
-        />
-
-        <Cylinder
-          {...modelProps}
-          material={wheelMaterial}
-          rotation={new Euler(0, 0, (-Math.PI / 180) * 90)}
-          scale={[0.2, 0.1, 0.2]}
-          position={[-0.5, -0.25, 0.75]}
-        />
-
-        <Cylinder
-          {...modelProps}
-          material={wheelMaterial}
-          rotation={new Euler(0, 0, (-Math.PI / 180) * 90)}
-          scale={[0.2, 0.1, 0.2]}
-          position={[0.5, -0.25, -0.75]}
-        />
-
-        <Cylinder
-          {...modelProps}
-          material={wheelMaterial}
-          rotation={new Euler(0, 0, (-Math.PI / 180) * 90)}
-          scale={[0.2, 0.1, 0.2]}
-          position={[0.5, -0.25, 0.75]}
-        />
       </RigidBody>
-    </mesh>
+
+      {wheelPositions.map((wheelPosition, index) => (
+        <RigidBody
+          position={wheelPosition}
+          colliders="hull"
+          type="dynamic"
+          key={index}
+          ref={wheelRefs.current[index]}
+          scale={[0.1, 0.2, 0.2]}
+        >
+          <Cylinder
+            rotation={[0, 0, Math.PI / 2]}
+            args={[1, 1, 1, 32]}
+            castShadow
+            receiveShadow
+            material={wheelMaterial}
+          />
+        </RigidBody>
+      ))}
+      {wheelPositions.map((wheelPosition, index) => (
+        <WheelJoint
+          key={index}
+          body={chassisBody}
+          wheel={wheelRefs.current[index]}
+          bodyAnchor={wheelPosition}
+          wheelAnchor={[0, 0, 0]}
+          rotationAxis={[1, 0, 0]}
+        />
+      ))}
+    </group>
   )
 }

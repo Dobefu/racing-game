@@ -4,4 +4,10 @@ globalThis.config = {
     physics: true,
     wireframe: false,
   },
+  controls: {
+    forward: "w",
+    backward: "s",
+    left: "a",
+    right: "d",
+  },
 }

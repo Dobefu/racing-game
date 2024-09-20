@@ -9,7 +9,8 @@ export default function TestScene() {
   const { config } = useConfig()
   const { camera } = useThree()
 
-  camera.position.y = 3
+  camera.position.y = 2
+  camera.position.z = 4
 
   return (
     <>
@@ -18,9 +19,9 @@ export default function TestScene() {
       <directionalLight intensity={1.5} position={[3, 5, 10]} castShadow />
       <OrbitControls />
 
-      <Car position={[0, 1, 0]} />
+      <Car position={[0, 0.5, 0]} />
 
-      <RigidBody>
+      <RigidBody type="fixed">
         <Plane
           scale={[10, 10, 1]}
           rotation={new Euler((-Math.PI / 180) * 90, 0, 0)}
